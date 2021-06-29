@@ -1,0 +1,40 @@
+---
+- name: ArgoCD | Create manifest
+  template:
+    src: argocd-install.yml.j2
+    dest: "{{ kube_config_dir }}/argocd-install.yml"
+
+- name: ArgoCD | Create addon dir
+  file:
+    path: "{{ kube_config_dir }}/addons/argocd_install"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: ArgoCD | Templates list
+  set_fact:
+    argocd_install_templates:
+      - { name: 00-namespace, file: 00-namespace.yml, type: ns }
+      - { name: all-argocd-install, file: argocd-install.yml, type: ds }
+
+- name: ArgoCD | Create manifests
+  template:
+    src: "{{ item.file }}.j2"
+    dest: "{{ kube_config_dir }}/addons/argocd_install/{{ item.file }}"
+  with_items: "{{ argocd_install_templates }}"
+  register: argocd_install__manifests
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: ArgoCD | Apply manifests
+  kube:
+    name: "{{ item.item.name }}"
+    namespace: "{{ argocd_namespace }}"
+    kubectl: "{{ bin_dir }}/kubectl"
+    resource: "{{ item.item.type }}"
+    filename: "{{ kube_config_dir }}/addons/argocd_install/{{ item.item.file }}"
+    state: "latest"
+  with_items: "{{ argocd_install_manifests.results }}"

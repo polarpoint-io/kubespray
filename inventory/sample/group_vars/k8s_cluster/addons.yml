@@ -180,3 +180,7 @@ metallb_speaker_enabled: true
 # The plugin manager for kubectl
 krew_enabled: false
 krew_root_dir: "/usr/local/krew"
+
+# ArgoCD deployment
+argocd_enabled: true
+argocd_namespace: "argocd"
