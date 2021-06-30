@@ -17,8 +17,17 @@
 - name: ArgoCD | Templates list
   set_fact:
     argocd_install_templates:
-      - { name: 00-namespace, file: 00-namespace.yml, type: ns }
-      - { name: all-argocd-install, file: argocd-install.yml, type: ds }
+      - { name: argocd-namespace, file: argocd-namespace.yml, type: ns }
+      - { name: argocd-customresourcedefinition, file: argocd-customresourcedefinition.yml, type: crd }
+      - { name: argocd-serviceaccount, file: argocd-serviceaccount.yml, type: sa }
+      - { name: argocd-role, file: argocd-role.yml, type: role }        
+      - { name: argocd-rolebinding, file: argocd-rolebinding.yml, type: rolebinding }   
+      - { name: argocd-configmap, file: argocd-configmap.yml, type: cm }
+      - { name: argocd-secret, file: argocd-secret.yml, type: secret }      
+      - { name: argocd-service, file: argocd-service.yml, type: service }        
+      - { name: argocd-deployment, file: argocd-deployment.yml, type: deployment }       
+      - { name: argocd-statefulset, file: argocd-statefulset.yml, type: statefulset }   
+      - { name: argocd-networkpolicy, file: argocd-networkpolicy.yml, type: networkpolicy }   
 
 - name: ArgoCD | Create manifests
   template:
