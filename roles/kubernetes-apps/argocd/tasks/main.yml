@@ -1,9 +1,4 @@
 ---
-- name: ArgoCD | Create manifest
-  template:
-    src: argocd-install.yml.j2
-    dest: "{{ kube_config_dir }}/argocd-install.yml"
-
 - name: ArgoCD | Create addon dir
   file:
     path: "{{ kube_config_dir }}/addons/argocd_install"
