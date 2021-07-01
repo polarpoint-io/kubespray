@@ -2,23 +2,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: foundational
+  name: applications
 spec:
   generators:
   - git:
-      repoURL: https://github.com/polarpoint-io/argocd-applicationset-base.git
+      repoURL: https://github.com/polarpoint-io/argocd-applications.git
       revision: HEAD
       directories:
-      - path: foundational/*
+      - path: applications/*
   template:
     metadata:
       name: '{{path.basename}}'
     spec:
       project: default
       source:
-        repoURL: https://github.com/polarpoint-io/argocd-applicationset-base.git
+        repoURL: https://github.com/polarpoint-io/argocd-applications.git
         targetRevision: HEAD
         path: '{{path}}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{path.basename}}'
+        namespace: applications
