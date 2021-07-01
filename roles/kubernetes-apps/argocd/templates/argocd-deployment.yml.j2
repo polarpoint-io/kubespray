@@ -29,7 +29,7 @@ spec:
       - command:
         - /shared/argocd-dex
         - rundex
-        image: ghcr.io/dexidp/dex:v2.27.0
+        image: dexidp/dex:v2.27.0
         imagePullPolicy: Always
         name: dex
         ports:
@@ -75,7 +75,7 @@ metadata:
     app.kubernetes.io/part-of: argocd
   name: argocd-redis-ha-haproxy
 spec:
-  replicas: 3
+  replicas: 2
   revisionHistoryLimit: 1
   selector:
     matchLabels:

@@ -184,3 +184,7 @@ krew_root_dir: "/usr/local/krew"
 # ArgoCD deployment
 argocd_enabled: true
 argocd_namespace: "argocd"
+
+# ArgoCD ApplicationSet deployment
+argocd_applicationset_enabled: true
+argocd_applicationset_namespace: "argocd"

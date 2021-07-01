@@ -1,0 +1,24 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-base
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/polarpoint-io/argocd-applicationset-base
+      revision: HEAD
+      directories:
+      - path: cluster-base/*
+  template:
+    metadata:
+      name: '{{path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/polarpoint-io/argocd-applicationset-base
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
