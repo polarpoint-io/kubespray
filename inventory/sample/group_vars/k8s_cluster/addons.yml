@@ -188,3 +188,7 @@ argocd_namespace: "argocd"
 # ArgoCD ApplicationSet deployment
 argocd_applicationset_enabled: true
 argocd_applicationset_namespace: "argocd"
+
+# ArgoCD Applications deployment
+argocd_applications_enabled: true
+argocd_applications_namespace: "applications"
