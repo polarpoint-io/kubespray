@@ -459,8 +459,8 @@ server:
 
   ## Additional command line arguments to pass to argocd-server
   ##
-  extraArgs: []
-  #  - --insecure
+  extraArgs:
+   - --insecure
 
   # This flag is used to either remove or pass the CLI flag --staticassets /shared/app to the argocd-server app
   staticAssets:
@@ -610,8 +610,7 @@ server:
     ## Secrets must be manually created in the namespace
     ##
     hosts:
-      []
-      # - argocd.example.com
+      - deploy.ltrudev.corp-apps.com
     paths:
       - /
     pathType: Prefix
@@ -698,7 +697,7 @@ server:
   configEnabled: true
   config:
     # Argo CD's externally facing base URL (optional). Required when configuring SSO
-    url: https://argocd.example.com
+    url: https://deploy.ltrudev.corp-apps.com
     # Argo CD instance label key
     application.instanceLabelKey: argocd.argoproj.io/instance
 
@@ -764,63 +763,52 @@ server:
   ## Not well tested and not well supported on release v1.0.0.
   ## Applications
   ## reference: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/
-  additionalApplications: []
-  # - name: guestbook
-  #   namespace: argocd
-  #   additionalLabels: {}
-  #   additionalAnnotations: {}
-  #   project: guestbook
-  #   source:
-  #     repoURL: https://github.com/argoproj/argocd-example-apps.git
-  #     targetRevision: HEAD
-  #     path: guestbook
-  #     directory:
-  #       recurse: true
-  #  destination:
-  #     server: https://kubernetes.default.svc
-  #     namespace: guestbook
-  #  syncPolicy:
-  #    automated:
-  #      prune: false
-  #      selfHeal: false
+  additionalApplications:
+  - name: argocd-configuration
+    namespace: argocd
+    additionalLabels: {}
+    additionalAnnotations: {}
+    project: argocd-configuration
+    source:
+      helm:
+        version: v3
+      repoURL: https://gitsc.corp-apps.com/runa/argocd-app-of-apps.git
+      targetRevision: HEAD
+      path: ./
+    destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+    syncPolicy:
+      automated:
+        prune: false
+        selfHeal: true
+      syncOptions:
+      - CreateNamespace=true
 
   ## Projects
   ## reference: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/
-  additionalProjects: []
-  # - name: guestbook
-  #   namespace: argocd
-  #   additionalLabels: {}
-  #   additionalAnnotations: {}
-  #   description: Example Project
-  #   sourceRepos:
-  #   - '*'
-  #   destinations:
-  #   - namespace: guestbook
-  #     server: https://kubernetes.default.svc
-  #   clusterResourceWhitelist: []
-  #   namespaceResourceBlacklist:
-  #   - group: ''
-  #     kind: ResourceQuota
-  #   - group: ''
-  #     kind: LimitRange
-  #   - group: ''
-  #     kind: NetworkPolicy
-  #     orphanedResources: {}
-  #     roles: []
-  #   namespaceResourceWhitelist:
-  #   - group: 'apps'
-  #     kind: Deployment
-  #   - group: 'apps'
-  #     kind: StatefulSet
-  #   orphanedResources: {}
-  #   roles: []
-  #   syncWindows:
-  #   - kind: allow
-  #     schedule: '10 1 * * *'
-  #     duration: 1h
-  #     applications:
-  #     - '*-prod'
-  #     manualSync: true
+  additionalProjects:
+    - name: argocd-configuration
+      namespace: argocd
+      additionalLabels: {}
+      additionalAnnotations: {}
+      description: argocd-configuration
+      sourceRepos:
+      - '*'
+      destinations:
+      - namespace: '*'
+        server: '*'
+      clusterResourceWhitelist: []
+      namespaceResourceBlacklist:
+      - group: ''
+        kind: ResourceQuota
+      - group: ''
+        kind: LimitRange
+      - group: ''
+        kind: NetworkPolicy
+      namespaceResourceWhitelist:
+      - group: '*'
+        kind: '*'
 
   ## Enable Admin ClusterRole resources.
   ## Enable if you would like to grant rights to ArgoCD to deploy to the local Kubernetes cluster.
