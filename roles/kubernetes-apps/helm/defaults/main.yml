@@ -1,2 +1,2 @@
 ---
-helm_enabled: false
+helm_enabled: true

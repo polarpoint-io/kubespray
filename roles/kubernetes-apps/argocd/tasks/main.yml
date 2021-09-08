@@ -1,7 +1,7 @@
 ---
-- name: ArgoCD | Create addon dir
+- name: ArgoCD | Create helm chart directory
   file:
-    path: "{{ kube_config_dir }}/addons/argocd_install"
+    path: "{{ kube_config_dir }}/charts/argocd"
     state: directory
     owner: root
     group: root
@@ -9,36 +9,23 @@
   when:
     - inventory_hostname == groups['kube_control_plane'][0]
 
-- name: ArgoCD | Templates list
-  set_fact:
-    argocd_install_templates:
-      - { name: argocd-namespace, file: argocd-namespace.yml, type: ns }
-      - { name: argocd-customresourcedefinition, file: argocd-customresourcedefinition.yml, type: crd }
-      - { name: argocd-serviceaccount, file: argocd-serviceaccount.yml, type: sa }
-      - { name: argocd-role, file: argocd-role.yml, type: role }        
-      - { name: argocd-rolebinding, file: argocd-rolebinding.yml, type: rolebinding }   
-      - { name: argocd-configmap, file: argocd-configmap.yml, type: cm }
-      - { name: argocd-secret, file: argocd-secret.yml, type: secret }      
-      - { name: argocd-service, file: argocd-service.yml, type: service }        
-      - { name: argocd-deployment, file: argocd-deployment.yml, type: deployment }       
-      - { name: argocd-statefulset, file: argocd-statefulset.yml, type: statefulset }   
-      - { name: argocd-networkpolicy, file: argocd-networkpolicy.yml, type: networkpolicy }   
-
-- name: ArgoCD | Create manifests
-  template:
-    src: "{{ item.file }}.j2"
-    dest: "{{ kube_config_dir }}/addons/argocd_install/{{ item.file }}"
-  with_items: "{{ argocd_install_templates }}"
-  register: argocd_install__manifests
+- name: ArgoCD | Copy Helm files
+  copy:
+    src: files/charts/argocd/
+    dest: "{{ kube_config_dir }}/charts/argocd"
+    owner: root
+    group: root
+    mode: 0644
   when:
     - inventory_hostname == groups['kube_control_plane'][0]
 
-- name: ArgoCD | Apply manifests
-  kube:
-    name: "{{ item.item.name }}"
+
+- name: ArgoCD | Helm install (upgrade)
+  kubernetes.core.helm:
+    name: argocd-configuration
     namespace: "{{ argocd_namespace }}"
-    kubectl: "{{ bin_dir }}/kubectl"
-    resource: "{{ item.item.type }}"
-    filename: "{{ kube_config_dir }}/addons/argocd_install/{{ item.item.file }}"
-    state: "latest"
-  with_items: "{{ argocd_install_manifests.results }}"
+    chart_ref: "{{ kube_config_dir }}/charts/argocd"
+    values_files:
+      - "{{ kube_config_dir }}/charts/argocd/values.yaml"
+  when:
+    - inventory_hostname == groups['kube_control_plane'][0]
